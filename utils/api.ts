@@ -71,10 +71,10 @@ export const createQuote = async (body: Quote) => {
     return response.json();
 };
 
-export const updateQuote = async (body: QuoteUpdatePayload, quoteId: string) => {
+export const updateQuote = async (quote: QuoteUpdatePayload, quoteId: string) => {
     const config = {
         method: "put",
-        body: JSON.stringify({ quote: body }),
+        body: JSON.stringify({ quote }),
     };
 
     const response = await fetch(`${BASE_URL}/${quoteId}`, config);

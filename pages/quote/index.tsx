@@ -8,8 +8,44 @@ import Link from "next/link";
 
 type Premium = number;
 
+interface Quote {
+    quote: {
+        quoteId: string;
+        rating_address: {
+            line_1: string;
+            line_2: string;
+            city: string;
+            state: string;
+            postal: string;
+        };
+        postal_holder: {
+            first_name: string;
+            last_name: string;
+        };
+        variable_selections: {
+            deductible: number;
+            asteroid_collision: number;
+        };
+        variable_options: {
+            deductible: {
+                title: string;
+                description: string;
+                values: [number];
+                default: number;
+            };
+            asteroid_collision: {
+                title: string;
+                description: string;
+                values: [number];
+                default: number;
+            };
+        };
+        premium: number;
+    };
+}
+
 export default function Quote() {
-    const [quoteData, setQuote] = useState({quote: {}});
+    const [quoteData, setQuote] = useState<Quote>();
     const [isProcessing, setProcessing] = useState(false);
     const [premium, setPremium] = useState<Premium | null>(null);
     const { register, handleSubmit, getValues } = useForm();
@@ -17,15 +53,14 @@ export default function Quote() {
     const onConfirm = (data) => {
         const body = {
             ...quoteData.quote,
-            asteroidCollisionValue: getValues("asteroidCollisionValue"),
-            deductibleValue: getValues("deductibleValue"),
+            asteroidCollisionValue: getValues("asteroidCollisionValue") || quoteData.quote.variable_selections.asteroid_collision,
+            deductibleValue: getValues("deductibleValue") || quoteData.quote.variable_selections.deductible,
         };
 
         setProcessing(true);
 
         updateQuote(parseQuoteUpdatePayload(body), body.quoteId)
             .then((data) => {
-                console.log("data:", data);
                 setPremium(data.quote.premium);
             })
             .catch((error) => {
@@ -42,8 +77,6 @@ export default function Quote() {
 
         setQuote(JSON.parse(data));
     }, []);
-
-    console.log("QUOTE: ", quoteData);
 
     const title = css({
         display: "block",
@@ -119,7 +152,7 @@ export default function Quote() {
                     <div css={btnContainer}>
                         <Link href="/rating">Back</Link>
                         <button css={confirmBtn} type="submit">
-                            {isProcessing ? <span>Processing...</span> : <span>Confirm</span> }
+                            {isProcessing ? <span>Processing...</span> : <span>Confirm</span>}
                         </button>
                     </div>
                 </form>
