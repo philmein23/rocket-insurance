@@ -9,7 +9,8 @@ import Link from "next/link";
 type Premium = number;
 
 export default function Quote() {
-    const [quoteData, setQuote] = useState({});
+    const [quoteData, setQuote] = useState({quote: {}});
+    const [isProcessing, setProcessing] = useState(false);
     const [premium, setPremium] = useState<Premium | null>(null);
     const { register, handleSubmit, getValues } = useForm();
 
@@ -20,6 +21,8 @@ export default function Quote() {
             deductibleValue: getValues("deductibleValue"),
         };
 
+        setProcessing(true);
+
         updateQuote(parseQuoteUpdatePayload(body), body.quoteId)
             .then((data) => {
                 console.log("data:", data);
@@ -27,10 +30,14 @@ export default function Quote() {
             })
             .catch((error) => {
                 return Error(`Error at: ${error}`);
+            })
+            .finally(() => {
+                setProcessing(false);
             });
     };
 
     useEffect(() => {
+        // grab quote from cache then load into memory via setQuote.
         const data = localStorage.getItem("quote");
 
         setQuote(JSON.parse(data));
@@ -66,9 +73,9 @@ export default function Quote() {
     });
 
     const mainContainer = css({
-        display: 'flex',
-        flexDirection: 'column'
-    })
+        display: "flex",
+        flexDirection: "column",
+    });
 
     const premiumContainer = css({
         display: "flex",
@@ -112,7 +119,7 @@ export default function Quote() {
                     <div css={btnContainer}>
                         <Link href="/rating">Back</Link>
                         <button css={confirmBtn} type="submit">
-                            Confirm
+                            {isProcessing ? <span>Processing...</span> : <span>Confirm</span> }
                         </button>
                     </div>
                 </form>

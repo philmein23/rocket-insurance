@@ -19,17 +19,23 @@ interface RatingInput {
 export default function Rating() {
     const { register, handleSubmit } = useForm<RatingInput>();
     const [rating, setRating] = useState<RatingInput | undefined>();
+    const [isProcessing, setProcessing] = useState(false);
     const { push } = useRouter();
 
     const next = (data) => {
+        setProcessing(true);
         createQuote(parseQuoteBody(data))
             .then((d) => {
+                // cache data into local storage to be consumed in next page
                 localStorage.setItem("quote", JSON.stringify(d));
 
                 push("/quote");
             })
             .catch((error) => {
                 return new Error(`Error at ${error}`);
+            })
+            .finally(() => {
+                setProcessing(false);
             });
     };
 
@@ -46,7 +52,7 @@ export default function Rating() {
         "> span": {
             gridColumn: "1/-1",
         },
-        marginBottom: '30px'
+        marginBottom: "30px",
     });
 
     const address = css({
@@ -74,47 +80,47 @@ export default function Rating() {
     });
     return (
         <Panel>
-            <form css={formContainer} onSubmit={handleSubmit(next)}>
+            <form data-testid="rating-form" css={formContainer} onSubmit={handleSubmit(next)}>
                 <div css={policy}>
                     <span css={label}>Policy Holder</span>
                     <div>
-                        <label>First Name</label>
-                        <input type="text" {...register("firstName", { required: true })} />
+                        <label htmlFor="firstName">First Name</label>
+                        <input type="text" id="firstName" {...register("firstName", { required: true })} />
                     </div>
                     <div>
-                        <label>Last Name</label>
-                        <input type="text" {...register("lastName", { required: true })} />
+                        <label htmlFor="lastName">Last Name</label>
+                        <input type="text" id="lastName" {...register("lastName", { required: true })} />
                     </div>
                 </div>
                 <div css={address}>
                     <span css={label}>Address</span>
                     <div className="sa-1">
-                        <label>Street Address</label>
-                        <input type="text" {...register("line1", { required: true })} />
+                        <label htmlFor="line1">Street Address</label>
+                        <input type="text" id="line1" {...register("line1", { required: true })} />
                     </div>
                     <div className="sa-2">
-                        <label>Street Address 2</label>
-                        <input type="text" {...register("line2")} />
+                        <label htmlFor="line2">Street Address 2</label>
+                        <input type="text" id="line2" {...register("line2")} />
                     </div>
 
                     <div className="city">
-                        <label>City</label>
-                        <input type="text" {...register("city", { required: true })} />
+                        <label htmlFor="city">City</label>
+                        <input type="text" id="city" {...register("city", { required: true })} />
                     </div>
 
                     <div className="state">
-                        <label>State</label>
-                        <input type="text" {...register("state", { required: true })} />
+                        <label htmlFor="state">State</label>
+                        <input type="text" id="state" {...register("state", { required: true })} />
                     </div>
 
                     <div className="postal">
-                        <label>Postal Code</label>
-                        <input type="text" {...register("postal", { required: true })} />
+                        <label htmlFor="postal">Postal Code</label>
+                    <input type="text" id="postal" {...register("postal", { required: true })} />
                     </div>
                 </div>
                 <div>
                     <button type="submit" css={nextBtn}>
-                        Next
+                        {isProcessing ? <span>Processing...</span> : <span>Next</span>}
                     </button>
                 </div>
             </form>
