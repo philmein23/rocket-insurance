@@ -23,8 +23,8 @@ export default function Rating() {
 
     const next = (data) => {
         createQuote(parseQuoteBody(data))
-            .then((quote) => {
-                localStorage.setItem("quote", JSON.stringify(quote));
+            .then((d) => {
+                localStorage.setItem("quote", JSON.stringify(d));
 
                 push("/quote");
             })
@@ -46,6 +46,7 @@ export default function Rating() {
         "> span": {
             gridColumn: "1/-1",
         },
+        marginBottom: '30px'
     });
 
     const address = css({
