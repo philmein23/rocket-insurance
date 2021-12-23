@@ -68,6 +68,9 @@ export default function Quote() {
             })
             .finally(() => {
                 setProcessing(false);
+                
+                // remove cache after receiving premium
+                localStorage.removeItem("quote");
             });
     };
 
